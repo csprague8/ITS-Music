@@ -1,0 +1,17 @@
+// ITS Music 101.idl : IDL source for ITS Music 101
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ITS Music 101.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(B2C541BE-A596-420D-88C6-9BCE8FCE9A08),
+	version(1.0)	
+]
+library ITSMusic101Lib
+{
+	importlib("stdole2.tlb");
+};
