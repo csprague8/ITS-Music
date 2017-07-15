@@ -15,6 +15,7 @@ class CITSMusic101Dlg : public CDialogEx
 // Construction
 public:
 	CITSMusic101Dlg(CWnd* pParent = NULL);	// standard constructor
+   ~CITSMusic101Dlg();
 
 public:
    // Dialog Data

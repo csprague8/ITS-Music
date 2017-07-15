@@ -4,7 +4,7 @@
 #include <Mmreg.h>
 //using Microsoft.DirectX.DirectSound;
 
-
+#include <list>
 
 bool SoundCaptureBase::IsCapturing()
 {
@@ -37,9 +37,9 @@ SoundCaptureBase::SoundCaptureBase(SoundCaptureDevice device)
 {
    device = device;
 
-   positionEvent = new AutoResetEvent(false);
-   positionEventHandle = positionEvent.SafeWaitHandle;
-   terminated = new ManualResetEvent(true);
+   //positionEvent = new AutoResetEvent(false);
+   //positionEventHandle = positionEvent.SafeWaitHandle;
+   //terminated = new ManualResetEvent(true);
 }
 
 void SoundCaptureBase::EnsureIdle()
@@ -59,53 +59,52 @@ void SoundCaptureBase::Start()
 
    isCapturing = true;
 
-   WAVEFORMAT format;
+   WAVEFORMATEX format;
+   format.wFormatTag = WAVE_FORMAT_PCM;
    format.nChannels = ChannelCount;
-   format.BitsPerSample = BitsPerSample;
-   format.nSamplesPerSec = SampleRate;
-   format.wFormatTag = WaveFormatTag.Pcm;
-   format.nBlockAlign = (short)((format.nChannels * format.BitsPerSample + 7) / 8);
+   format.nSamplesPerSec = SampleRate();
+   format.wBitsPerSample = BitsPerSample;
+   format.nBlockAlign = (short)((format.nChannels * format.wBitsPerSample + 7) / 8);
    format.nAvgBytesPerSec = format.nBlockAlign  * format.nSamplesPerSec;
 
-   bufferLength = format.AverageBytesPerSecond * BufferSeconds;
-   CaptureBufferDescription desciption = new CaptureBufferDescription();
-   desciption.Format = format;
-   desciption.BufferBytes = bufferLength;
+   bufferLength = format.nAvgBytesPerSec * BufferSeconds;
+   DSCBUFFERDESC desciption;
+   desciption.lpwfxFormat = &format;
+   desciption.dwBufferBytes = bufferLength;
 
-   capture = new Capture(device.Id);
-   buffer = new CaptureBuffer(desciption, capture);
+   HRESULT hr;
+   hr = DirectSoundCaptureCreate8(&device.Id, &capture, NULL);
+   hr = capture->CreateCaptureBuffer(&desciption, &buffer, NULL);
 
    int waitHandleCount = BufferSeconds * NotifyPointsInSecond;
-   BufferPositionNotify[] positions = new BufferPositionNotify[waitHandleCount];
+   LPDSBPOSITIONNOTIFY positions = new DSBPOSITIONNOTIFY[waitHandleCount];
    for (int i = 0; i < waitHandleCount; i++)
    {
-      BufferPositionNotify position = new BufferPositionNotify();
-      position.Offset = (i + 1) * bufferLength / positions.Length - 1;
-      position.EventNotifyHandle = positionEventHandle.DangerousGetHandle();
-      positions[i] = position;
+      positions[i].dwOffset = (i + 1) * bufferLength / waitHandleCount - 1;
+      positions[i].hEventNotify = positionEventHandle.DangerousGetHandle();
    }
 
-   notify = new Notify(buffer);
-   notify.SetNotificationPositions(positions);
+   buffer->QueryInterface(IID_IDirectSoundNotify8, (LPVOID*)&notify);
+   notify->SetNotificationPositions(waitHandleCount, positions);
 
    terminated.Reset();
-   thread = new Thread(new ThreadStart(ThreadLoop));
-   thread.Name = "Sound capture";
-   thread.Start();
+
+   thread = new std::thread(&ThreadLoop);
 }
 
 void SoundCaptureBase::ThreadLoop()
 {
-   buffer.Start(true);
+   buffer->Start(true);
 
    try
    {
       int nextCapturePosition = 0;
-      WaitHandle[] handles = new WaitHandle[] { terminated, positionEvent };
+      WaitHandle handles[] = new WaitHandle[] { terminated, positionEvent };
+      
       while (WaitHandle.WaitAny(handles) > 0)
       {
-         int capturePosition, readPosition;
-         buffer.GetCurrentPosition(out capturePosition, out readPosition);
+         DWORD capturePosition, readPosition;
+         buffer->GetCurrentPosition(&capturePosition, &readPosition);
 
          int lockSize = readPosition - nextCapturePosition;
          if (lockSize < 0) lockSize += bufferLength;
@@ -113,21 +112,17 @@ void SoundCaptureBase::ThreadLoop()
 
          int itemsCount = lockSize >> 1;
 
-         short[] data = (short[])buffer.Read(nextCapturePosition, typeof(short), LockFlag.None, itemsCount);
-         ProcessData(data);
+         short data[] = (short[])buffer->Read(nextCapturePosition, typeof(short), LockFlag.None, itemsCount);
+         ProcessData(data, itemsCount);
          nextCapturePosition = (nextCapturePosition + lockSize) % bufferLength;
       }
    }
+   catch (...)
+   {
+   }
 
-
-   buffer.Stop();   
+   buffer->Stop();
 }
-
-/// <summary>
-/// Processes the captured data.
-/// </summary>
-/// <param name="data">Captured data</param>
-void SoundCaptureBase::ProcessData(short[] data);
 
 /// <summary>
 /// Stops capture process.
@@ -139,11 +134,11 @@ void SoundCaptureBase::Stop()
       isCapturing = false;
 
       terminated.Set();
-      thread.Join();
+      thread->join();
 
-      notify.Dispose();
-      buffer.Dispose();
-      capture.Dispose();
+      notify->Release();
+      buffer->Release();
+      capture->Release();
    }
 }
 

@@ -3,6 +3,7 @@
 //
 
 #include "stdafx.h"
+
 #include "ITS Music 101.h"
 #include "ITS_Music_101Dlg.h"
 #include "afxdialogex.h"
@@ -12,16 +13,21 @@
 #include "Scales.h"
 #include "MainTextStrings.h"
 #include "Rhythms.h"
-#include "../Fister/Pipe.h"
+#include "ProgressLogging.h"
+
 #include <vector>
 #include <fstream>
 #include <iostream>
+#include <string>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
+static int current_category = -1;
+
+static Prog_Map_t progress_map;
 
 // CAboutDlg dialog used for App About
 
@@ -63,6 +69,11 @@ CITSMusic101Dlg::CITSMusic101Dlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CITSMusic101Dlg::IDD, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+}
+
+CITSMusic101Dlg::~CITSMusic101Dlg()
+{
+   write_progress_log(current_category, progress_map);
 }
 
 void CITSMusic101Dlg::DoDataExchange(CDataExchange* pDX)
@@ -118,6 +129,8 @@ BOOL CITSMusic101Dlg::OnInitDialog()
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
+
+   read_progress_log(&current_category, &progress_map);
 
    CComboBox *categories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_CATEGORIES);
    categories_combo->Clear();
@@ -180,7 +193,87 @@ BOOL CITSMusic101Dlg::OnInitDialog()
       GuitarNeck->ShowWindow(SW_SHOW);
    }
 
-   SetDlgItemText(IDC_MainText, startup_text);
+   if (current_category == -1)
+   {
+      SetDlgItemText(IDC_MainText, startup_text);
+   }
+   else
+   {
+      int percent = 0;
+      int cat = -1;
+      int subcat = -1;
+      bool needsImproving = false;
+
+      for (Prog_Map_t::iterator it = progress_map.begin(); it != progress_map.end(); ++it)
+      {
+         cat++;
+         subcat = -1;
+
+         for (int sub = 0; sub < it->second.size(); sub++)
+         {
+            subcat = sub;
+            bool viewed = it->second[sub][e_viewed] > 0;
+
+            if (!viewed )
+            {
+               percent = 0;
+               needsImproving = true;
+               break;
+            }
+
+            int attempts = it->second[sub][e_attempts];
+            int accuracy = it->second[sub][e_accuracy];
+
+            int tmpPercent = (int)((float)accuracy / (float)attempts * 100.0);
+
+            if (tmpPercent < 60)
+            {
+               percent = tmpPercent;
+               needsImproving = true;
+               break;
+            }
+         }
+
+         if (needsImproving)
+            break;
+      }
+      //CString txt;
+      std::wstring recCat = categories_text[cat];
+      if (subcat > 0)
+      {
+         recCat += L" - " + std::to_wstring(subcat) + L". ";
+         switch (cat)
+         {
+         case e_note_lengths:
+         case e_rest_types:
+            recCat += note_length_text[subcat];
+            break;
+         case e_rhythm_patterns:
+            recCat += rhythms_text[subcat];
+            break;
+         case e_scales:
+            recCat += scale_text[subcat];
+            break;
+         case e_music_keys:
+            recCat += notes_text2[subcat];
+            break;
+         case e_note_values:
+         case e_note_mapping:
+            break;
+         }
+      }
+      wchar_t msg[512];
+      swprintf_s(msg, startup_progress_text,
+         categories_text[current_category],
+         recCat.c_str(),
+         percent);
+      //txt.Format(startup_progress_text, 
+      //   categories_text[current_category],
+      //   categories_text[cat],
+      //   percent);
+
+      SetDlgItemText(IDC_MainText, msg);
+   }
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -299,6 +392,8 @@ void CITSMusic101Dlg::OnCategoryChanged()
 
    int index = categories_combo->CComboBox::GetCurSel();
    
+   current_category = index;
+
    switch (index)
    {
    case e_note_lengths:
@@ -380,8 +475,8 @@ void CITSMusic101Dlg::OnSubCategoryChanged()
    int catIdx = categories_combo->CComboBox::GetCurSel();
    int subcatIdx = subcategories_combo->CComboBox::GetCurSel();
 
-   int num_sub_categories = 0;
-
+   progress_map[catIdx][subcatIdx][e_viewed]++;
+   
    std::vector<note_info_t> data;
 
    switch (catIdx)
@@ -766,21 +861,37 @@ void CITSMusic101Dlg::OnCheckButton()
    std::ofstream file("log.txt", std::ios::app);
    file << (LPCSTR)CT2A(ret.c_str());
    file.close();
+
+
+   CComboBox *categories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_CATEGORIES);
+   CComboBox *subcategories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_SUBCATEGORIES);
+   CComboBox *notes_combo = (CComboBox*)GetDlgItem(IDC_COMBO_NOTE_BASE);
+   int noteSel = notes_combo->CComboBox::GetCurSel();
+   int catIdx = categories_combo->CComboBox::GetCurSel();
+   int subcatIdx = subcategories_combo->CComboBox::GetCurSel();
+
+   progress_map[catIdx][subcatIdx][e_attempts]++;
+   if (ret.empty())
+   {
+      progress_map[catIdx][subcatIdx][e_accuracy]++;
+   }
+
+   write_progress_log(current_category, progress_map);
 }
 
 void CITSMusic101Dlg::OnRecord()
 {
-   NPipe::CPipe pipe;
+  // NPipe::CPipe pipe;
    m_recording = !m_recording;
    
    if (m_recording)
    {
       SetDlgItemText(IDC_RECORD, L"Stop");
-      pipe.StartRecordingToFile();
+      //pipe.StartRecordingToFile();
    }
    else
    {
-      pipe.StopRecordingToFile();
+      //pipe.StopRecordingToFile();
       SetDlgItemText(IDC_RECORD, L"Record");
    }
 }

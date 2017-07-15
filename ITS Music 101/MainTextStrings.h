@@ -99,3 +99,11 @@ wchar_t mapping_info_text[] =
    L"It can be seen that a note can be played in many positions on a guitar."nl2
    L"Change the selected note to see all locations for that note."
 ;
+
+
+#define startup_progress_text \
+   L"Welcome back to ITS Music 101. \r\n  \r\n\
+You last left off at category %s. \r\n \r\n\
+Based on your progress it is recommened that you select\r\n\
+Category %s. \r\n\
+You are at %i mastery of that topic."

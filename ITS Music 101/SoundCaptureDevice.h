@@ -13,6 +13,7 @@ class SoundCaptureDevice
    std::string m_name;
 
 public:
+   SoundCaptureDevice() {}
    bool IsDefault();
    std::string Name();
    GUID Id();

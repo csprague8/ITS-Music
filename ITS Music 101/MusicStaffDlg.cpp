@@ -228,7 +228,7 @@ void CMusicStaffDlg::draw_notes(std::vector<note_info_t> *notes,
       HWND hEdit = CreateWindowEx(
          WS_EX_CLIENTEDGE, L"EDIT", L"",
          WS_CHILD | WS_VISIBLE | (test ? 0 : WS_DISABLED),
-         x, rc.bottom - 20, (note.sign != e_no_sign ? 30 : 20), 20,
+         x, rc.bottom - 20, (note.sign != e_no_sign ? 30 : 22), 20,
          this->GetSafeHwnd(), NULL,
          GetModuleHandle(NULL), NULL);
 

@@ -111,6 +111,7 @@
   <ItemGroup>
     <ClInclude Include="GuitarNeckDlg.h" />
     <ClInclude Include="MainTextStrings.h" />
+    <ClInclude Include="ProgressLogging.h" />
     <ClInclude Include="Rhythms.h" />
     <ClInclude Include="Scales.h" />
     <ClInclude Include="ITS Music 101.h" />
@@ -144,6 +145,7 @@
       <DebugInformationFormat Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Async</ExceptionHandling>
     </ClCompile>
+    <ClCompile Include="ProgressLogging.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

@@ -4,6 +4,7 @@
 //using Microsoft.Win32.SafeHandles;
 
 #include <thread>
+#include <dsound.h>
 
 /// <summary>
 /// Base class to capture audio samples.
@@ -39,17 +40,19 @@ private:
    void Dispose(bool disposing);
    
 protected: 
-   void ProcessData(short[] data);
+   virtual void ProcessData(short *data, int length);
 
 public:
-   Capture capture;
-   CaptureBuffer buffer;
-   Notify notify;
    int bufferLength;
-   AutoResetEvent positionEvent;
-   SafeWaitHandle positionEventHandle;
-   ManualResetEvent terminated;
-   std::thread thread;
+   IDirectSoundCapture* capture;
+   IDirectSoundCaptureBuffer* buffer;
+   IDirectSoundNotify *notify;
+
+   //AutoResetEvent positionEvent;
+   //SafeWaitHandle positionEventHandle;
+   //ManualResetEvent terminated;
+
+   std::thread *thread;
    SoundCaptureDevice device;
 };
 
