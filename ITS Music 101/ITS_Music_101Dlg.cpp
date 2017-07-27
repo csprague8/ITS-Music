@@ -394,40 +394,63 @@ void CITSMusic101Dlg::OnCategoryChanged()
    
    current_category = index;
 
+   std::wstring check_msg = get_check_info_text();
+
    switch (index)
    {
    case e_note_lengths:
-      SetDlgItemText(IDC_MainText, note_length_info_text);
+      if (test)
+         SetDlgItemText(IDC_MainText, check_msg.c_str());
+      else
+         SetDlgItemText(IDC_MainText, note_length_info_text);
       num_sub_categories = e_max_lengths;
       sub_categories = note_length_text;
       break;
    case e_rest_types:
-      SetDlgItemText(IDC_MainText, rest_length_info_text);
+      if (test)
+         SetDlgItemText(IDC_MainText, check_msg.c_str());
+      else
+         SetDlgItemText(IDC_MainText, rest_length_info_text);
       num_sub_categories = e_max_lengths;
       sub_categories = note_length_text;
       break;
    case e_note_values:
-      SetDlgItemText(IDC_MainText, note_value_info_text);
+      if (test)
+         SetDlgItemText(IDC_MainText, check_msg.c_str());
+      else
+         SetDlgItemText(IDC_MainText, note_value_info_text);
       on_note_value_category();
       break;
    case e_rhythm_patterns:
-      SetDlgItemText(IDC_MainText, rhythms_info_text);
+      if (test)
+         SetDlgItemText(IDC_MainText, check_msg.c_str());
+      else
+         SetDlgItemText(IDC_MainText, rhythms_info_text);
       num_sub_categories = e_max_rhythm_patterns;
       sub_categories = rhythms_text;
       break;
    case e_scales:
-      SetDlgItemText(IDC_MainText, scales_info_text);
+      if (test)
+         SetDlgItemText(IDC_MainText, check_msg.c_str());
+      else
+         SetDlgItemText(IDC_MainText, scales_info_text);
       dispNoteCombo = true;
       num_sub_categories = e_max_scales;
       sub_categories = scale_text;
       break;
    case e_music_keys:
-      SetDlgItemText(IDC_MainText, keys_info_text);
+      if (test)
+         SetDlgItemText(IDC_MainText, check_msg.c_str());
+      else
+         SetDlgItemText(IDC_MainText, keys_info_text);
       dispNoteCombo = true;
       on_key_changed();
       break;
    case e_note_mapping:
-      SetDlgItemText(IDC_MainText, mapping_info_text);
+      if (test)
+         SetDlgItemText(IDC_MainText, check_msg.c_str());
+      else
+         SetDlgItemText(IDC_MainText, mapping_info_text);
       dispNoteCombo = true;
       extCombo = true;
       MusicStaff1->ShowWindow(SW_HIDE);
@@ -711,7 +734,6 @@ void CITSMusic101Dlg::on_rhythm_pattern_change(int rhythm_type)
       size = sizeof(pattern10) / sizeof(int);
       pattern = pattern10;
       break;
-
    case e_rhythm_pattern_11:
       size = sizeof(pattern11) / sizeof(int);
       pattern = pattern11;
@@ -724,34 +746,6 @@ void CITSMusic101Dlg::on_rhythm_pattern_change(int rhythm_type)
       size = sizeof(pattern13) / sizeof(int);
       pattern = pattern13;
       break;
-   /*case e_rhythm_pattern_14:
-      size = sizeof(pattern14) / sizeof(int);
-      pattern = pattern14;
-      break;
-   case e_rhythm_pattern_15:
-      size = sizeof(pattern15) / sizeof(int);
-      pattern = pattern15;
-      break;
-   case e_rhythm_pattern_16:
-      size = sizeof(pattern16) / sizeof(int);
-      pattern = pattern16;
-      break;
-   case e_rhythm_pattern_17:
-      size = sizeof(pattern17) / sizeof(int);
-      pattern = pattern17;
-      break;
-   case e_rhythm_pattern_18:
-      size = sizeof(pattern18) / sizeof(int);
-      pattern = pattern18;
-      break;
-   case e_rhythm_pattern_19:
-      size = sizeof(pattern19) / sizeof(int);
-      pattern = pattern19;
-      break;
-   case e_rhythm_pattern_20:
-      size = sizeof(pattern20) / sizeof(int);
-      pattern = pattern20;
-      break;*/
    }
 
    if (pattern == NULL)
@@ -849,14 +843,22 @@ void CITSMusic101Dlg::ShowCatBox(bool show)
 
 void CITSMusic101Dlg::OnCheckButton()
 {
-   std::wstring ret = MusicStaff1->checkDataText();
+   std::wstring ret;
+   std::wstring info_text;
+
+   info_text = get_check_info_text();
+   
+   ret = MusicStaff1->checkDataText();
 
    if (MusicStaff2->IsWindowVisible())
    {
       ret += MusicStaff2->checkDataText();
    }
 
-   SetDlgItemText(IDC_MainText, ret.c_str());
+   info_text += nl2;
+   info_text += ret;
+
+   MessageBox(ret.c_str(), L"Incorrect Answer", 0);
 
    std::ofstream file("log.txt", std::ios::app);
    file << (LPCSTR)CT2A(ret.c_str());
@@ -898,4 +900,45 @@ void CITSMusic101Dlg::OnRecord()
 
 void CITSMusic101Dlg::OnTestRecord()
 {
+}
+
+std::wstring CITSMusic101Dlg::get_check_info_text()
+{
+   std::wstring ret = tested_for_txt;
+
+   CComboBox *categories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_CATEGORIES);
+   int index = categories_combo->CComboBox::GetCurSel();
+
+   switch (index)
+   {
+      case e_note_lengths:
+         ret += L"note lengths.\r\n";
+         ret += note_length_check_info_text;
+         break;
+      case e_rest_types:
+         ret += L"rest lengths.\r\n";
+         ret = note_length_check_info_text;
+         break;
+      case e_note_values:
+         ret += L"note values.\r\n";
+         ret = note_value_check_info_text;
+         break;
+      case e_rhythm_patterns:
+         ret += L"rhythm patterns.\r\n";
+         ret = note_length_check_info_text;
+         break;
+      case e_scales:
+         ret += L"scales\r\n";
+         ret = note_value_check_info_text;
+         break;
+      case e_music_keys:
+         ret += L"msuic keys\r\n";
+         ret = note_value_check_info_text;
+         break;
+      case e_note_mapping:
+         ret += L"note mapping\r\n";
+         ret = note_value_check_info_text;
+   }
+
+   return ret;
 }

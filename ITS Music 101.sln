@@ -5,12 +5,6 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ITS Music 101", "ITS Music 101\ITS Music 101.vcxproj", "{808741A4-3682-45A3-AEEB-E1486F77A20F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundCapture", "FftGuitarTuner_src\SoundCapture\SoundCapture.csproj", "{DAE12676-B26C-4487-A1A5-D7FE2E64E6CE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundAnalysis", "FftGuitarTuner_src\SoundAnalysis\SoundAnalysis.csproj", "{ABA54DC3-324B-49DE-B79E-C4F573306E4F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FftGuitarTuner", "FftGuitarTuner_src\FftGuitarTuner\FftGuitarTuner.csproj", "{088AF27F-6F9D-4481-9B85-8E67C49D75EB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,36 +25,6 @@ Global
 		{808741A4-3682-45A3-AEEB-E1486F77A20F}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{808741A4-3682-45A3-AEEB-E1486F77A20F}.Release|Win32.ActiveCfg = Release|Win32
 		{808741A4-3682-45A3-AEEB-E1486F77A20F}.Release|Win32.Build.0 = Release|Win32
-		{DAE12676-B26C-4487-A1A5-D7FE2E64E6CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DAE12676-B26C-4487-A1A5-D7FE2E64E6CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DAE12676-B26C-4487-A1A5-D7FE2E64E6CE}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{DAE12676-B26C-4487-A1A5-D7FE2E64E6CE}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{DAE12676-B26C-4487-A1A5-D7FE2E64E6CE}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{DAE12676-B26C-4487-A1A5-D7FE2E64E6CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DAE12676-B26C-4487-A1A5-D7FE2E64E6CE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DAE12676-B26C-4487-A1A5-D7FE2E64E6CE}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{DAE12676-B26C-4487-A1A5-D7FE2E64E6CE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{DAE12676-B26C-4487-A1A5-D7FE2E64E6CE}.Release|Win32.ActiveCfg = Release|Any CPU
-		{ABA54DC3-324B-49DE-B79E-C4F573306E4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ABA54DC3-324B-49DE-B79E-C4F573306E4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ABA54DC3-324B-49DE-B79E-C4F573306E4F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{ABA54DC3-324B-49DE-B79E-C4F573306E4F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{ABA54DC3-324B-49DE-B79E-C4F573306E4F}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{ABA54DC3-324B-49DE-B79E-C4F573306E4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ABA54DC3-324B-49DE-B79E-C4F573306E4F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ABA54DC3-324B-49DE-B79E-C4F573306E4F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{ABA54DC3-324B-49DE-B79E-C4F573306E4F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{ABA54DC3-324B-49DE-B79E-C4F573306E4F}.Release|Win32.ActiveCfg = Release|Any CPU
-		{088AF27F-6F9D-4481-9B85-8E67C49D75EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{088AF27F-6F9D-4481-9B85-8E67C49D75EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{088AF27F-6F9D-4481-9B85-8E67C49D75EB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{088AF27F-6F9D-4481-9B85-8E67C49D75EB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{088AF27F-6F9D-4481-9B85-8E67C49D75EB}.Debug|Win32.ActiveCfg = Debug|Any CPU
-		{088AF27F-6F9D-4481-9B85-8E67C49D75EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{088AF27F-6F9D-4481-9B85-8E67C49D75EB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{088AF27F-6F9D-4481-9B85-8E67C49D75EB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{088AF27F-6F9D-4481-9B85-8E67C49D75EB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{088AF27F-6F9D-4481-9B85-8E67C49D75EB}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

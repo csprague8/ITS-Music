@@ -107,3 +107,25 @@ You last left off at category %s. \r\n \r\n\
 Based on your progress it is recommened that you select\r\n\
 Category %s. \r\n\
 You are at %i mastery of that topic."
+
+wchar_t tested_for_txt[] = 
+   L"You are now being tested for understanding of ";
+
+wchar_t note_length_check_info_text[]  =
+   L"Use the following values in the empty text boxes" nl
+   L"below each note:" nl
+   tab L" * W - Whole note" nl
+   tab L" * H - Half note" nl
+   tab L" * Q - Quarter note" nl
+   tab L" * E - Eighth note" nl
+   tab L" * S - Sixteenth note" nl2
+   L"When done entering values, push the check button." nl2
+   ;
+
+wchar_t note_value_check_info_text[] =
+   L"Use the following values in the empty text boxes "
+   L"below each note:" nl
+   tab L"Ab, A, A#, Bb, B, C, C#, Db, D, D#, Eb, E, F, F#, Gb, G, G#" nl
+   L"When done entering values, push the check button." nl
+   L"Boxes with correct answers will be disabled." nl2
+   ;

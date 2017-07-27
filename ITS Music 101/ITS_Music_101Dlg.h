@@ -58,6 +58,7 @@ private:
       bool isRhythm, int key = C);
    void ShowNotesBox(bool show, bool ext);
    void ShowCatBox(bool show);
+   std::wstring get_check_info_text();
 
 public:
    CMusicStaffDlg *MusicStaff1;

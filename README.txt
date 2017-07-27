@@ -1,3 +1,7 @@
+Requirements:
+    * Windows 7 or above
+
+
 Setup:
     Before first use, make sure the visual studio 2013 redistributable 
     package is installed. To do this run vcredist_x64.exe on your machine.
@@ -27,6 +31,14 @@ Features:
     * Note mapping
         * mapping notes to the fretboard of a guitar
     * Adjustable Metronome
+
+
+Intelligent Features:
+    * Stores current category on exit
+    * Test mode that allows for user input. Input is checked and a feedback message is displayed.
+    * Recommended category displayed on startup based on user’s past experiences.
+    * The application will only recommend the next category when completed greater than 60% of their attempts.
+
 
 Operation:
     * Start the application
