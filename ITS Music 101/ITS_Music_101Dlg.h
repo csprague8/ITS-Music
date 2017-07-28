@@ -32,7 +32,9 @@ protected:
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	afx_msg void OnPaint();
+   afx_msg void OnPaint();
+   afx_msg void OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI);
+   afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
@@ -44,8 +46,6 @@ public:
    afx_msg void OnCategoryChanged();
    afx_msg void OnSubCategoryChanged();
    afx_msg void OnCheckButton();
-   afx_msg void OnRecord();
-   afx_msg void OnTestRecord();
 
 private:
    void on_note_value_category();
@@ -56,6 +56,7 @@ private:
    void on_rhythm_pattern_change(int rhythm_type);
    void draw_data(std::vector<note_info_t> data, bool draw_bass_clef,
       bool isRhythm, int key = C);
+   void draw_neck_data();
    void ShowNotesBox(bool show, bool ext);
    void ShowCatBox(bool show);
    std::wstring get_check_info_text();
@@ -64,6 +65,12 @@ public:
    CMusicStaffDlg *MusicStaff1;
    CMusicStaffDlg *MusicStaff2;
    CGuitarNeckDlg *GuitarNeck;
+
+   CComboBox *categories_combo = NULL;
+   CComboBox *subcategories_combo = NULL;
+   CComboBox *notes_combo = NULL;
+   CButton *test_box = NULL;
+   CEdit *maintxt = NULL;
 
 private:
    Metronome metronome;

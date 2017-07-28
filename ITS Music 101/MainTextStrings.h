@@ -129,3 +129,8 @@ wchar_t note_value_check_info_text[] =
    L"When done entering values, push the check button." nl
    L"Boxes with correct answers will be disabled." nl2
    ;
+
+wchar_t window_resize_msg[] =
+   L"If at any point portions of the content go off the screen " nl
+   L"you may resize the window."
+   ;

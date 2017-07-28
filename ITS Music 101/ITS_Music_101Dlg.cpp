@@ -85,13 +85,13 @@ BEGIN_MESSAGE_MAP(CITSMusic101Dlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+   ON_WM_GETMINMAXINFO()
+   ON_WM_SIZE()
    ON_BN_CLICKED(IDC_START_STOP_METRONOME, CITSMusic101Dlg::OnStartStop)
    ON_BN_CLICKED(IDC_TEMPO_UP_BUTTON, CITSMusic101Dlg::OnTempoUp)
    ON_BN_CLICKED(IDC_TEMPO_DOWN_BUTTON, CITSMusic101Dlg::OnTempoDown)
    ON_BN_CLICKED(IDC_TEST_MODE, CITSMusic101Dlg::OnCategoryChanged)
    ON_BN_CLICKED(IDC_CHECK_BUTTON, CITSMusic101Dlg::OnCheckButton)
-   ON_BN_CLICKED(IDC_RECORD, CITSMusic101Dlg::OnRecord)
-   ON_BN_CLICKED(IDC_TEST_RECORD, CITSMusic101Dlg::OnTestRecord)
    ON_EN_CHANGE(IDC_TEMPO_TEXT, CITSMusic101Dlg::OnTempoChanged)
    ON_LBN_SELCHANGE(IDC_COMBO_CATEGORIES, CITSMusic101Dlg::OnCategoryChanged)
    ON_LBN_SELCHANGE(IDC_COMBO_SUBCATEGORIES, CITSMusic101Dlg::OnSubCategoryChanged)
@@ -105,34 +105,14 @@ BOOL CITSMusic101Dlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// Add "About..." menu item to system menu.
-
-	// IDM_ABOUTBOX must be in the system command range.
-	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
-	ASSERT(IDM_ABOUTBOX < 0xF000);
-
-	CMenu* pSysMenu = GetSystemMenu(FALSE);
-	if (pSysMenu != NULL)
-	{
-		BOOL bNameValid;
-		CString strAboutMenu;
-		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
-		ASSERT(bNameValid);
-		if (!strAboutMenu.IsEmpty())
-		{
-			pSysMenu->AppendMenu(MF_SEPARATOR);
-			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
-		}
-	}
-
-	// Set the icon for this dialog.  The framework does this automatically
-	//  when the application's main window is not a dialog
-	SetIcon(m_hIcon, TRUE);			// Set big icon
-	SetIcon(m_hIcon, FALSE);		// Set small icon
+   categories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_CATEGORIES);
+   subcategories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_SUBCATEGORIES);
+   notes_combo = (CComboBox*)GetDlgItem(IDC_COMBO_NOTE_BASE);
+   test_box = (CButton*)GetDlgItem(IDC_TEST_MODE);
+   maintxt = (CEdit*)GetDlgItem(IDC_MainText);
 
    read_progress_log(&current_category, &progress_map);
 
-   CComboBox *categories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_CATEGORIES);
    categories_combo->Clear();
    for (int cat = 0; cat < e_max_categories; cat++)
    {
@@ -140,8 +120,6 @@ BOOL CITSMusic101Dlg::OnInitDialog()
    }
    categories_combo->SetWindowTextW(L"Select Category");
 
-
-   CComboBox *notes_combo = (CComboBox*)GetDlgItem(IDC_COMBO_NOTE_BASE);
    notes_combo->Clear();
    for (int n = 0; n < e_max_note; n++)
    {
@@ -168,34 +146,35 @@ BOOL CITSMusic101Dlg::OnInitDialog()
 
    CRect rect;
    GetClientRect(&rect);
+   int clientWidth = rect.Width();
 
    if (MusicStaff1)
    {
-      GetClientRect(&rect);
-      int clientWidth = rect.Width();
       MusicStaff1->MoveWindow(10, 150, clientWidth - 20, 140);
-      MusicStaff1->ShowWindow(SW_SHOW);
+      MusicStaff1->ShowWindow(SW_HIDE);
    }
 
    if (MusicStaff2)
    {
-      GetClientRect(&rect);
-      int clientWidth = rect.Width();
       MusicStaff2->MoveWindow(10, 250, clientWidth - 20, 140);
-      MusicStaff2->ShowWindow(SW_SHOW);
+      MusicStaff2->ShowWindow(SW_HIDE);
    }
 
    if (GuitarNeck)
    {
-      GetClientRect(&rect);
-      int clientWidth = rect.Width();
       GuitarNeck->MoveWindow(10, 150, clientWidth - 20, 175);
-      GuitarNeck->ShowWindow(SW_SHOW);
+      GuitarNeck->ShowWindow(SW_HIDE);
    }
+
+   maintxt->ShowWindow(SW_HIDE);
 
    if (current_category == -1)
    {
-      SetDlgItemText(IDC_MainText, startup_text);
+      std::wstring msg = startup_text;
+      msg += nl2;
+      msg += window_resize_msg;
+
+      SetDlgItemText(IDC_MainText, msg.c_str());
    }
    else
    {
@@ -262,8 +241,8 @@ BOOL CITSMusic101Dlg::OnInitDialog()
             break;
          }
       }
-      wchar_t msg[512];
-      swprintf_s(msg, startup_progress_text,
+      wchar_t tmp[512];
+      swprintf_s(tmp, startup_progress_text,
          categories_text[current_category],
          recCat.c_str(),
          percent);
@@ -272,8 +251,15 @@ BOOL CITSMusic101Dlg::OnInitDialog()
       //   categories_text[cat],
       //   percent);
 
-      SetDlgItemText(IDC_MainText, msg);
+      std::wstring msg = tmp;
+      msg += nl2;
+      msg += window_resize_msg;
+
+      SetDlgItemText(IDC_MainText, msg.c_str());
    }
+
+
+   maintxt->ShowWindow(SW_SHOW);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -320,6 +306,44 @@ void CITSMusic101Dlg::OnPaint()
 		CDialogEx::OnPaint();
 	}
 }
+
+void CITSMusic101Dlg::OnGetMinMaxInfo(MINMAXINFO FAR* lpMMI)
+{
+   // set the minimum tracking width
+   // and the minimum tracking height of the window
+   lpMMI->ptMinTrackSize.x = 700;
+   lpMMI->ptMinTrackSize.y = 650;
+}
+
+void CITSMusic101Dlg::OnSize(UINT nType, int cx, int cy)
+{
+   CDialogEx::OnSize(nType, cx, cy);
+
+   static bool onInit = true;
+
+   if (!onInit)
+   {
+      int index = categories_combo->CComboBox::GetCurSel();
+
+      if (index >= 0)
+      {
+         OnCategoryChanged();
+      }
+      else
+      {
+         CRect windowRect;
+
+         GetClientRect(&windowRect);
+
+         maintxt->MoveWindow(10, 150,
+            windowRect.Width() - 20, windowRect.Height() - 150 - 10);
+         maintxt->ShowWindow(SW_SHOW);
+      }
+   }
+
+   onInit = false;
+}
+
 
 // The system calls this function to obtain the cursor to display while the user drags
 //  the minimized window.
@@ -372,10 +396,6 @@ void CITSMusic101Dlg::OnTempoChanged()
 
 void CITSMusic101Dlg::OnCategoryChanged()
 {
-   CComboBox *categories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_CATEGORIES);
-   CComboBox *subcategories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_SUBCATEGORIES);
-   CButton *test_box = (CButton*)GetDlgItem(IDC_TEST_MODE);
-
    bool test = (test_box->GetCheck() != FALSE);
 
    subcategories_combo->Clear();
@@ -453,10 +473,7 @@ void CITSMusic101Dlg::OnCategoryChanged()
          SetDlgItemText(IDC_MainText, mapping_info_text);
       dispNoteCombo = true;
       extCombo = true;
-      MusicStaff1->ShowWindow(SW_HIDE);
-      MusicStaff2->ShowWindow(SW_HIDE);
-      GuitarNeck->ShowWindow(SW_SHOW);
-
+      draw_neck_data();
       ShowNotesBox(dispNoteCombo, extCombo);
       OnSubCategoryChanged();
       return;
@@ -491,9 +508,6 @@ void CITSMusic101Dlg::OnCategoryChanged()
 
 void CITSMusic101Dlg::OnSubCategoryChanged()
 {
-   CComboBox *categories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_CATEGORIES);
-   CComboBox *subcategories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_SUBCATEGORIES);
-   CComboBox *notes_combo = (CComboBox*)GetDlgItem(IDC_COMBO_NOTE_BASE);
    int noteSel = notes_combo->CComboBox::GetCurSel();
    int catIdx = categories_combo->CComboBox::GetCurSel();
    int subcatIdx = subcategories_combo->CComboBox::GetCurSel();
@@ -584,7 +598,6 @@ void CITSMusic101Dlg::on_note_types_change(int note_type, bool isRest)
 
 void CITSMusic101Dlg::on_scale_changed(int scale_type)
 {
-   CComboBox *notes_combo = (CComboBox*)GetDlgItem(IDC_COMBO_NOTE_BASE);
    int noteSel = notes_combo->CComboBox::GetCurSel();
 
    std::vector<note_info_t> data;
@@ -677,7 +690,6 @@ void CITSMusic101Dlg::on_scale_changed(int scale_type)
 
 void CITSMusic101Dlg::on_key_changed()
 {
-   CComboBox *notes_combo = (CComboBox*)GetDlgItem(IDC_COMBO_NOTE_BASE);
    int noteSel = notes_combo->CComboBox::GetCurSel();
 
    std::vector<note_info_t> data;
@@ -764,38 +776,84 @@ void CITSMusic101Dlg::draw_data(std::vector<note_info_t> data,
    bool draw_bass_clef, bool isRhythm, int key)
 {
    CRect rect;
+   CRect tboxRect;
+   CRect windowRect;
 
-   CButton *test_box = (CButton*)GetDlgItem(IDC_TEST_MODE);
+   GetClientRect(&windowRect);
+
    bool test = (test_box->GetCheck() != FALSE);
+
+   maintxt->ShowWindow(SW_HIDE);
+
+   int nextY = 150;
 
    // Clear the staffs
    MusicStaff1->Invalidate();
    MusicStaff2->Invalidate();
+   maintxt->Invalidate();
 
    // Draw trebble staff
+   MusicStaff1->MoveWindow(10, nextY, windowRect.Width() - 20, 150);
    MusicStaff1->draw_notes(&data, e_trebble_clef, 4, 4, key, isRhythm, test);
-   MusicStaff1->UpdateWindow();
    MusicStaff1->GetClientRect(&rect);
 
    // Draw bass staff
    if (draw_bass_clef)
    {
+      nextY += (rect.Height() + 10);
       MusicStaff2->ShowWindow(SW_SHOW);
-      MusicStaff2->MoveWindow(10, 150 + rect.Height() + 10,
+      MusicStaff2->MoveWindow(10, nextY, 
          rect.Width(), rect.Height(), TRUE);
-      MusicStaff2->UpdateWindow();
       MusicStaff2->draw_notes(&data, e_bass_clef, 4, 4, key, isRhythm, test);
-      MusicStaff2->UpdateWindow();
+      MusicStaff2->GetClientRect(&rect);
    }
    else
    {
       MusicStaff2->ShowWindow(SW_HIDE);
    }
+
+   nextY += (rect.Height() + 20);
+
+   if (nextY + 10 < windowRect.Height())
+   {
+      maintxt->MoveWindow(10, nextY,
+         windowRect.Width() - 20, windowRect.Height() - nextY - 10);
+      maintxt->ShowWindow(SW_SHOW);
+   }
+
+   MusicStaff1->UpdateWindow();
+   MusicStaff2->UpdateWindow();
+   maintxt->UpdateWindow();
+
+   UpdateWindow();
+}
+
+void CITSMusic101Dlg::draw_neck_data()
+{
+   MusicStaff1->ShowWindow(SW_HIDE);
+   MusicStaff2->ShowWindow(SW_HIDE);
+   maintxt->ShowWindow(SW_HIDE);
+   GuitarNeck->ShowWindow(SW_SHOW);
+
+   CRect neckRect;
+   CRect tboxRect;
+   CRect windowRect;
+   GuitarNeck->GetClientRect(&neckRect);
+   maintxt->GetClientRect(&tboxRect);
+   GetClientRect(&windowRect);
+
+   int y = 150 + neckRect.Height() + 10;
+
+   if (y + 10 < windowRect.Height())
+   {
+      maintxt->MoveWindow(10, y,
+         windowRect.Width() - 20, windowRect.Height() - y - 10);
+      maintxt->ShowWindow(SW_SHOW);
+   }
 }
 
 void CITSMusic101Dlg::ShowNotesBox(bool show, bool ext)
 {
-   CComboBox *notes_combo = (CComboBox*)GetDlgItem(IDC_COMBO_NOTE_BASE);
    notes_combo->Clear();
    notes_combo->ResetContent();
 
@@ -864,10 +922,6 @@ void CITSMusic101Dlg::OnCheckButton()
    file << (LPCSTR)CT2A(ret.c_str());
    file.close();
 
-
-   CComboBox *categories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_CATEGORIES);
-   CComboBox *subcategories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_SUBCATEGORIES);
-   CComboBox *notes_combo = (CComboBox*)GetDlgItem(IDC_COMBO_NOTE_BASE);
    int noteSel = notes_combo->CComboBox::GetCurSel();
    int catIdx = categories_combo->CComboBox::GetCurSel();
    int subcatIdx = subcategories_combo->CComboBox::GetCurSel();
@@ -879,27 +933,6 @@ void CITSMusic101Dlg::OnCheckButton()
    }
 
    write_progress_log(current_category, progress_map);
-}
-
-void CITSMusic101Dlg::OnRecord()
-{
-  // NPipe::CPipe pipe;
-   m_recording = !m_recording;
-   
-   if (m_recording)
-   {
-      SetDlgItemText(IDC_RECORD, L"Stop");
-      //pipe.StartRecordingToFile();
-   }
-   else
-   {
-      //pipe.StopRecordingToFile();
-      SetDlgItemText(IDC_RECORD, L"Record");
-   }
-}
-
-void CITSMusic101Dlg::OnTestRecord()
-{
 }
 
 std::wstring CITSMusic101Dlg::get_check_info_text()
