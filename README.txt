@@ -4,8 +4,10 @@ Requirements:
 
 Setup:
     Before first use, make sure the visual studio 2013 redistributable 
-    package is installed. To do this run vcredist_x64.exe on your machine.
+    package is installed. To do this run vcredist_x64.exe and vcredist_x86.exe on your machine.
+    These executables can be found at https://www.microsoft.com/en-us/download/details.aspx?id=40784
 
+    
 Features:
     * Note Lengths
         * Whole  notes
