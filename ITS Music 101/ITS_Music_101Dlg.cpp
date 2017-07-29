@@ -68,7 +68,7 @@ END_MESSAGE_MAP()
 CITSMusic101Dlg::CITSMusic101Dlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CITSMusic101Dlg::IDD, pParent)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+   m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
 CITSMusic101Dlg::~CITSMusic101Dlg()
@@ -104,6 +104,9 @@ END_MESSAGE_MAP()
 BOOL CITSMusic101Dlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
+
+   m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+   SendMessage(WM_SETICON, ICON_SMALL, (LPARAM)m_hIcon);
 
    categories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_CATEGORIES);
    subcategories_combo = (CComboBox*)GetDlgItem(IDC_COMBO_SUBCATEGORIES);
