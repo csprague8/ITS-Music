@@ -20,7 +20,7 @@ wchar_t note_length_info_text[] =
    tab L"* Sixteenth Notes (S): are played for 1/4 beat." nl2
    L"The value names are based on a 4/4 time signiture. " nl
    L"This means there are 4 beats per measure with a quarter note being a single beat." nl
-   L"Different time signitures will be included in futures expansions of ITS Music 101."
+   L"Different time signatures will be included in futures expansions of ITS Music 101."
    ;
 
 wchar_t rest_length_info_text[] =
@@ -40,10 +40,10 @@ wchar_t rest_length_info_text[] =
 
 wchar_t note_value_info_text[] =
    L"Music note values range from A to G." nl
-   L"Thse notes can be are part of an octave. " nl
+   L"Thse notes are part of an octave. " nl
    L"Octaves range from a note to the note of the same name "
    L"above or below." nl2
-   L"The notes displayed about range from C to G, covering 2 octaves." nl
+   L"The notes displayed above range from C to G, covering 2 octaves." nl
    L"The notes are shown for both treble clef and bass clef." nl
    tab L"* Treble clef is generally used for instruments that use the middle "
        L"of the musical range, " nl
